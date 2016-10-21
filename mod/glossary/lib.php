@@ -2507,17 +2507,17 @@ function glossary_xml_import_files($xmlparent, $tag, $contextid, $filearea, $ite
                 'filename'  => $file['#']['FILENAME'][0]['#'],
                 'userid'    => $USER->id
             );
-            if(array_key_exists('FILEAUTHOR', $file['#'])) {
+            if (array_key_exists('FILEAUTHOR', $file['#'])) {
                 $filerecord['author'] = $file['#']['FILEAUTHOR'][0]['#'];
             }
-            if(array_key_exists('FILELICENSE', $file['#'])) {
-                $license = $file['#']['FILELICENSE'][0]['#']; 
+            if (array_key_exists('FILELICENSE', $file['#'])) {
+                $license = $file['#']['FILELICENSE'][0]['#'];
                 require_once($CFG->libdir . "/licenselib.php");
                 if (license_manager::get_license_by_shortname($license)) {
                     $filerecord['license'] = $license;
                 }
             }
-            $content =  $file['#']['CONTENTS'][0]['#'];
+            $content = $file['#']['CONTENTS'][0]['#'];
             $fs->create_file_from_string($filerecord, base64_decode($content));
             $count++;
         }
