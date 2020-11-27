@@ -115,5 +115,39 @@ class core_backup_async_backup_testcase extends \core_privacy\tests\provider_tes
         // Check backup was created successfully.
         $this->assertEquals(backup::STATUS_FINISHED_OK, $postbackuprec->status);
         $this->assertEquals(1.0, $postbackuprec->progress);
+
+        // Check backup was stored in correct area.
+        $coursecontextid = $DB->get_field('context', 'id', ['contextlevel' => CONTEXT_COURSE, 'instanceid' => $course->id]);
+        $this->assertEquals(1, $DB->count_records('files', ['contextid' => $coursecontextid,
+                'component' => 'backup', 'filearea' => 'course', 'filename' => 'backup.mbz']));
+
+        // Make a second backup with anonymized setting.
+        $bc = new backup_controller(backup::TYPE_1COURSE, $course->id, backup::FORMAT_MOODLE,
+                backup::INTERACTIVE_YES, backup::MODE_ASYNC, $USER->id);
+        $bc->get_plan()->get_setting('users')->set_value(true);
+        $bc->get_plan()->get_setting('anonymize')->set_value(true);
+        $bc->finish_ui();
+        $backupidan = $bc->get_backupid();
+        $bc->destroy();
+
+        // Create the adhoc task.
+        $asynctask = new \core\task\asynchronous_backup_task();
+        $asynctask->set_blocking(false);
+        $asynctask->set_custom_data(['backupid' => $backupidan]);
+        \core\task\manager::queue_adhoc_task($asynctask);
+
+        // We are expecting trace output during this test.
+        ob_start();
+        // Execute adhoc task.
+        $now = time();
+        $task = \core\task\manager::get_next_adhoc_task($now);
+        $task->execute();
+        \core\task\manager::adhoc_task_complete($task);
+        ob_end_clean();
+
+        // Check backup was stored in correct area.
+        $usercontextid = $DB->get_field('context', 'id', ['contextlevel' => CONTEXT_USER, 'instanceid' => $USER->id]);
+        $this->assertEquals(1, $DB->count_records('files', ['contextid' => $usercontextid,
+                'component' => 'user', 'filearea' => 'backup', 'filename' => 'backup.mbz']));
     }
 }

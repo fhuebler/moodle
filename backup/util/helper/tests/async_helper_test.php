@@ -140,10 +140,9 @@ class core_backup_async_helper_testcase extends \core_privacy\tests\provider_tes
         $coursecontext = context_course::instance($course->id);
         $renderer = $PAGE->get_renderer('core', 'backup');
 
-        $result = \async_helper::get_async_backups($renderer, $coursecontext->instanceid);
-
+        $result = \async_helper::get_async_backups('course', CONTEXT_COURSE, $coursecontext->instanceid);
         $this->assertEquals(1, count($result));
-        $this->assertEquals('backup.mbz', $result[0][0]);
+        $this->assertEquals('backup.mbz', $result[0]->filename);
     }
 
     /**
