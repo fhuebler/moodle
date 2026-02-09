@@ -42,9 +42,9 @@ abstract class grade_object {
 
     /**
      * Array of required table fields, must start with 'id'.
-     * @var array $required_fields
+     * @var array $requiredfields
      */
-    public $required_fields = array('id', 'timecreated', 'timemodified', 'hidden');
+    public $requiredfields = ['id', 'timecreated', 'timemodified', 'hidden'];
 
     /**
      * Array of optional fields with default values - usually long text information that is not always needed.
@@ -191,7 +191,7 @@ abstract class grade_object {
         $columns = $DB->get_columns($table); // Cached, no worries.
 
         foreach ($params as $var=>$value) {
-            if (!in_array($var, $instance->required_fields) and !array_key_exists($var, $instance->optional_fields)) {
+            if (!in_array($var, $instance->requiredfields) && !array_key_exists($var, $instance->optional_fields)) {
                 continue;
             }
             if (!array_key_exists($var, $columns)) {
@@ -319,7 +319,7 @@ abstract class grade_object {
         $data = new stdClass();
 
         foreach ($this as $var=>$value) {
-            if (in_array($var, $this->required_fields) or array_key_exists($var, $this->optional_fields)) {
+            if (in_array($var, $this->requiredfields) || array_key_exists($var, $this->optional_fields)) {
                 if (is_object($value) or is_array($value)) {
                     debugging("Incorrect property '$var' found when inserting grade object");
                 } else {
@@ -409,7 +409,7 @@ abstract class grade_object {
     public static function set_properties(&$instance, $params) {
         $params = (array) $params;
         foreach ($params as $var => $value) {
-            if (in_array($var, $instance->required_fields) or array_key_exists($var, $instance->optional_fields)) {
+            if (in_array($var, $instance->requiredfields) || array_key_exists($var, $instance->optional_fields)) {
                 $instance->$var = $value;
             }
         }

@@ -181,7 +181,7 @@ if ($ADMIN->fulltree) {
     $description = new lang_string('defaultgradescale_help', 'mod_assign');
 
     $choices = ['' => new lang_string('choosedots')];
-    $scales = grade_scale::fetch_all_global();
+    $scales = grade_scale::fetch_all_global(true);
     if ($scales !== false) {
         foreach ($scales as $scale) {
             $choices[$scale->id] = $scale->get_name();

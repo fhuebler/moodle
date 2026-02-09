@@ -752,6 +752,10 @@ EOD;
             $record['descriptionformat'] = FORMAT_MOODLE;
         }
 
+        if (!isset($record['locked'])) {
+            $record['locked'] = 0;
+        }
+
         $record['timemodified'] = time();
 
         if (isset($record['id'])) {
@@ -1155,7 +1159,7 @@ EOD;
             unset($record['grade']);
 
             if ($grade) {
-                $fields = $grade->required_fields + array_keys($grade->optional_fields);
+                $fields = $grade->requiredfields + array_keys($grade->optional_fields);
 
                 foreach ($fields as $field) {
                     $grade->{$field} = $record[$field] ?? $grade->{$field};

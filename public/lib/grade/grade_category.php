@@ -43,11 +43,11 @@ class grade_category extends grade_object {
 
     /**
      * Array of required table fields, must start with 'id'.
-     * @var array $required_fields
+     * @var array $requiredfields
      */
-    public $required_fields = array('id', 'courseid', 'parent', 'depth', 'path', 'fullname', 'aggregation',
+    public $requiredfields = ['id', 'courseid', 'parent', 'depth', 'path', 'fullname', 'aggregation',
                                  'keephigh', 'droplow', 'aggregateonlygraded', 'aggregateoutcomes',
-                                 'timecreated', 'timemodified', 'hidden');
+                                 'timecreated', 'timemodified', 'hidden'];
 
     /**
      * The course this category belongs to.
@@ -512,7 +512,7 @@ class grade_category extends grade_object {
         }
 
         $gradeinst = new grade_grade();
-        $fields = implode(',', $gradeinst->required_fields);
+        $fields = implode(',', $gradeinst->requiredfields);
 
         // where to look for final grades - include grade of this item too, we will store the results there
         $gis = array_merge($depends_on, array($this->grade_item->id));

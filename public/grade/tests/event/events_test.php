@@ -204,4 +204,35 @@ final class events_test extends \advanced_testcase {
         $this->assertEquals($url, $event->get_url());
         $this->assertEquals(\context_course::instance($this->course->id), $event->get_context());
     }
+
+    /**
+     * Test the scale locked event.
+     *
+     * @covers \core_event\scale_locked
+     */
+    public function test_scale_locked(): void {
+        $gradescale = new \grade_scale();
+        $gradescale->name        = 'unittestscale3';
+        $gradescale->courseid    = $this->course->id;
+        $gradescale->userid      = 317;
+        $gradescale->scale       = 'Distinction, Very Good, Good, Pass, Fail';
+        $gradescale->description = 'This scale is used to mark standard assignments.';
+        $gradescale->locked      = 0;
+        $id = $gradescale->insert();
+
+        $gradescale->locked = 1;
+        $url = new \moodle_url('/grade/edit/scale/index.php', ['id' => $this->course->id]);
+
+        // Trigger and capture the event.
+        $sink = $this->redirectEvents();
+        $gradescale->lock();
+        $events = $sink->get_events();
+        $event = reset($events);
+
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\core\event\scale_locked', $event);
+        $this->assertEquals($id, $event->objectid);
+        $this->assertEquals($url, $event->get_url());
+        $this->assertEquals(\context_course::instance($this->course->id), $event->get_context());
+    }
 }

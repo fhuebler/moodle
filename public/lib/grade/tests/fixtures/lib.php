@@ -121,6 +121,7 @@ abstract class grade_base_testcase extends advanced_testcase {
         $scale->userid      = $this->user[0]->id;
         $scale->scale       = 'Way off topic, Not very helpful, Fairly neutral, Fairly helpful, Supportive, Some good information, Perfect answer!';
         $scale->description = 'This scale defines some of qualities that make posts helpful within the Moodle help forums.\n Your feedback will help others see how their posts are being received.';
+        $scale->locked      = 0;
 
         $this->scale[0] = $this->getDataGenerator()->create_scale($scale);
         $this->scalemax[0] = substr_count($scale->scale, ',');
@@ -131,6 +132,7 @@ abstract class grade_base_testcase extends advanced_testcase {
         $scale->userid      = $this->user[0]->id;
         $scale->scale       = 'Distinction, Very Good, Good, Pass, Fail';
         $scale->description = 'This scale is used to mark standard assignments.';
+        $scale->locked      = 0;
 
         $this->scale[1] = $this->getDataGenerator()->create_scale($scale);
         $this->scalemax[1] = substr_count($scale->scale, ',');
@@ -141,6 +143,7 @@ abstract class grade_base_testcase extends advanced_testcase {
         $scale->userid      = $this->user[0]->id;
         $scale->scale       = 'Loner, Contentious, Disinterested, Participative, Follower, Leader';
         $scale->description = 'Describes the level of teamwork of a student.';
+        $scale->locked      = 0;
         $temp  = explode(',', $scale->scale);
         $scale->max         = count($temp) -1;
 
@@ -153,6 +156,7 @@ abstract class grade_base_testcase extends advanced_testcase {
         $scale->userid      = $this->user[0]->id;
         $scale->scale       = 'Does not understand theory, Understands theory but fails practice, Manages through, Excels';
         $scale->description = 'Level of expertise at a technical task, with a theoretical framework.';
+        $scale->locked      = 0;
         $temp  = explode(',', $scale->scale);
         $scale->max         = count($temp) -1;
 
@@ -165,6 +169,7 @@ abstract class grade_base_testcase extends advanced_testcase {
         $scale->userid      = $this->user[0]->id;
         $scale->scale       = 'Insufficient, Acceptable, Excellent.';
         $scale->description = 'Description of skills.';
+        $scale->locked      = 0;
 
         $this->scale[4] = $this->getDataGenerator()->create_scale($scale);
         $this->scalemax[4] = substr_count($scale->scale, ',');

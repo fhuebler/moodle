@@ -128,6 +128,8 @@ if ($mform->is_cancelled()) {
             $data->standard = 0;
         }
         $scale->courseid = !empty($data->standard) ? 0 : $courseid;
+        // Enable all created scales by default.
+        $scale->locked = 0;
         $scale->insert();
         $data = file_postupdate_standard_editor($data, 'description', $editoroptions, $systemcontext, 'grade', 'scale', $scale->id);
         $DB->set_field($scale->table, 'description', $data->description, array('id'=>$scale->id));

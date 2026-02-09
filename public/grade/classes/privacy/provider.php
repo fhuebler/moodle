@@ -1136,7 +1136,7 @@ class provider implements
             case 'grade_outcome':
             case 'grade_scale':
                 $obj = new $target([], false);
-                $fields = array_merge(array_keys($obj->optional_fields), $obj->required_fields);
+                $fields = array_merge(array_keys($obj->optional_fields), $obj->requiredfields);
                 break;
 
             case 'grade_grades_history':

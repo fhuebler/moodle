@@ -117,7 +117,7 @@ class framework extends base {
             ->add_joins($this->get_joins())
             ->add_field("{$frameworkalias}.scaleid")
             ->add_callback(static function(?string $scaleid): string {
-                $scales = get_scales_menu();
+                $scales = get_scales_menu(0, true);
                 return (string) ($scales[(int) $scaleid] ?? $scaleid);
             });
 

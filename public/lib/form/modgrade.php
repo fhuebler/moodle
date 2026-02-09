@@ -135,7 +135,12 @@ class MoodleQuickForm_modgrade extends MoodleQuickForm_group {
         // We have to create the scale and point elements first, as we need their IDs.
 
         // Grade scale select box.
-        $scales = get_scales_menu($COURSE->id);
+        if ($this->isupdate && $this->hasgrades) {
+            $scales = get_scales_menu($COURSE->id);
+        } else {
+            // Don't show locked scales if adding a new activity or no grades exist yet.
+            $scales = get_scales_menu($COURSE->id, true);
+        }
         $langscale = get_string('modgradetypescale', 'grades');
         $this->scaleformelement = $this->createFormElement('select', 'modgrade_scale', $langscale,
             $scales, $attributes);
@@ -319,7 +324,7 @@ class MoodleQuickForm_modgrade extends MoodleQuickForm_group {
      */
     protected function validate_scale($val) {
         global $COURSE;
-        $scales = get_scales_menu($COURSE->id);
+        $scales = get_scales_menu($COURSE->id, true);
         return (!empty($val) && isset($scales[(int)$val])) ? true : false;
     }
 

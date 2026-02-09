@@ -87,7 +87,7 @@ class edit_item_form extends moodleform {
                 $options[$scale->id] = $scale->get_name();
             }
         }
-        if ($scales = grade_scale::fetch_all_global()) {
+        if ($scales = grade_scale::fetch_all_global(true)) {
             foreach ($scales as $scale) {
                 $options[$scale->id] = $scale->get_name();
             }

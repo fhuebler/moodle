@@ -46,9 +46,10 @@ class grade_scale extends grade_object {
 
     /**
      * Array of required table fields, must start with 'id'.
-     * @var array $required_fields
+     * @var array $requiredfields
      */
-    public $required_fields = array('id', 'courseid', 'userid', 'name', 'scale', 'description', 'descriptionformat', 'timemodified');
+    public $requiredfields = ['id', 'courseid', 'userid', 'name', 'scale', 'description', 'descriptionformat', 'locked',
+    'timemodified'];
 
     /**
      * The course this scale belongs to.
@@ -97,6 +98,12 @@ class grade_scale extends grade_object {
      * @var int $descriptionformat
      */
     public int $descriptionformat;
+
+    /**
+     * Shows if the scale is locked and cannot be used for new activities.
+     * @var bool $locked
+     */
+    public bool $locked;
 
     /**
      * Finds and returns a grade_scale instance based on params.
@@ -312,10 +319,15 @@ class grade_scale extends grade_object {
     /**
      * Static function returning all global scales
      *
+     * @param boolean $unlockedonly Whether to include only unlocked scales.
      * @return grade_scale[]|false
      */
-    public static function fetch_all_global() {
-        return grade_scale::fetch_all(['courseid' => 0]);
+    public static function fetch_all_global($unlockedonly = false): array {
+        $params = ['courseid' => 0];
+        if ($unlockedonly) {
+            $params['locked'] = 0;
+        }
+        return self::fetch_all($params);
     }
 
     /**
@@ -325,7 +337,7 @@ class grade_scale extends grade_object {
      * @return array Returns an array of grade_scale instances
      */
     public static function fetch_all_local($courseid) {
-        return grade_scale::fetch_all(array('courseid'=>$courseid));
+        return self::fetch_all(['courseid' => $courseid]);
     }
 
     /**
@@ -334,7 +346,7 @@ class grade_scale extends grade_object {
      * @return bool
      */
     public function is_last_global_scale() {
-        return ($this->courseid == 0) && (count(self::fetch_all_global()) == 1);
+        return ($this->courseid == 0) && (count(self::fetch_all_global(true)) == 1);
     }
 
     /**
@@ -353,7 +365,6 @@ class grade_scale extends grade_object {
      */
     public function is_used() {
         global $DB;
-        global $CFG;
 
         // count grade items excluding the
         $params = array($this->id);
@@ -400,5 +411,56 @@ class grade_scale extends grade_object {
         $options->noclean = true;
         $description = file_rewrite_pluginfile_urls($this->description, 'pluginfile.php', $systemcontext->id, 'grade', 'scale', $this->id);
         return format_text($description, $this->descriptionformat, $options);
+    }
+
+    /**
+     * Returns whether the scale is locked.
+     *
+     * @return bool
+     */
+    public function is_locked(): bool {
+        return $this->locked;
+    }
+
+    /**
+     * Checks if scale can be locked.
+     *
+     * @return bool
+     */
+    public function can_lock(): bool {
+        return !$this->is_last_global_scale();
+    }
+
+    /**
+     * Locks this scale.
+     *
+     * @param string $source from where was the scale locked (mod/forum, manual, etc.)
+     * @return bool success
+     */
+    public function lock($source = null): bool {
+        global $DB;
+
+        $this->timemodified = time();
+        $this->locked = true;
+
+        $result = parent::update($source);
+        if ($result) {
+            // Trigger the scale locked event.
+            if (!empty($this->standard)) {
+                $eventcontext = context_system::instance();
+            } else {
+                if (!empty($this->courseid)) {
+                    $eventcontext = context_course::instance($this->courseid);
+                } else {
+                    $eventcontext = context_system::instance();
+                }
+            }
+            $event = \core\event\scale_locked::create([
+                'objectid' => $this->id,
+                'context' => $eventcontext,
+            ]);
+            $event->trigger();
+        }
+        return $result;
     }
 }

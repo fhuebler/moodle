@@ -2878,7 +2878,7 @@ class grade_tree extends grade_structure {
  * @return string html
  */
 function grade_button($type, $courseid, $object) {
-    global $CFG, $OUTPUT;
+    global $OUTPUT;
     if (preg_match('/grade_(.*)/', get_class($object), $matches)) {
         $objectidstring = $matches[1] . 'id';
     } else {
@@ -2887,15 +2887,29 @@ function grade_button($type, $courseid, $object) {
 
     $strdelete = get_string('delete');
     $stredit   = get_string('edit');
+    $strlock   = get_string('lock', 'grades');
 
     if ($type == 'delete') {
-        $url = new moodle_url('index.php', array('id' => $courseid, $objectidstring => $object->id, 'action' => 'delete', 'sesskey' => sesskey()));
+        $url = new moodle_url('index.php', [
+            'id' => $courseid,
+            $objectidstring => $object->id,
+            'action' => 'delete',
+            'sesskey' => sesskey(),
+        ]);
     } else if ($type == 'edit') {
-        $url = new moodle_url('edit.php', array('courseid' => $courseid, 'id' => $object->id));
+        $url = new moodle_url('edit.php', ['courseid' => $courseid, 'id' => $object->id]);
+    } else if ($type == 'lock') {
+        $url = new moodle_url('index.php', [
+            'id' => $courseid,
+            $objectidstring => $object->id,
+            'action' => 'lock',
+            'sesskey' => sesskey(),
+        ]);
+    } else {
+        throw new coding_exception('grade_button() first parameter must be "edit", "delete", or "lock"!');
     }
 
     return $OUTPUT->action_icon($url, new pix_icon('t/'.$type, ${'str'.$type}, '', array('class' => 'iconsmall')));
-
 }
 
 /**

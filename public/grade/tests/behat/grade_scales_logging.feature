@@ -21,7 +21,11 @@ Feature: We can view the logs for any changes to grade scales.
     And I set the following fields to these values:
       | id_scale | ONE,TWO,THREE |
     And I press "Save changes"
+    # Lock first scale
+    And I follow "Lock"
+    And I press "Continue"
     When I navigate to "Reports > Live logs" in site administration
     Then I should see "Scale created"
     And I should see "Scale updated"
     And I should see "Scale deleted"
+    And I should see "Scale locked"

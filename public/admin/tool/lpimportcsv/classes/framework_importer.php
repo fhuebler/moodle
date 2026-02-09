@@ -375,7 +375,7 @@ class framework_importer {
         require_once($CFG->libdir . '/gradelib.php');
 
         if (empty($this->scalecache)) {
-            $allscales = grade_scale::fetch_all_global();
+            $allscales = grade_scale::fetch_all_global(true);
             foreach ($allscales as $scale) {
                 $scale->load_items();
                 $this->scalecache[$scale->compact_items()] = $scale;

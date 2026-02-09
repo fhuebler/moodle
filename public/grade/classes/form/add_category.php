@@ -240,7 +240,7 @@ class add_category extends dynamic_form {
                 $options[$scale->id] = $scale->get_name();
             }
         }
-        if ($scales = grade_scale::fetch_all_global()) {
+        if ($scales = grade_scale::fetch_all_global(true)) {
             foreach ($scales as $scale) {
                 $options[$scale->id] = $scale->get_name();
             }

@@ -45,13 +45,13 @@ class grade_item extends grade_object {
 
     /**
      * Array of required table fields, must start with 'id'.
-     * @var array $required_fields
+     * @var array $requiredfields
      */
-    public $required_fields = array('id', 'courseid', 'categoryid', 'itemname', 'itemtype', 'itemmodule', 'iteminstance',
+    public $requiredfields = ['id', 'courseid', 'categoryid', 'itemname', 'itemtype', 'itemmodule', 'iteminstance',
                                  'itemnumber', 'iteminfo', 'idnumber', 'calculation', 'gradetype', 'grademax', 'grademin',
                                  'scaleid', 'outcomeid', 'gradepass', 'multfactor', 'plusfactor', 'aggregationcoef',
                                  'aggregationcoef2', 'sortorder', 'display', 'decimals', 'hidden', 'locked', 'locktime',
-                                 'needsupdate', 'weightoverride', 'timecreated', 'timemodified');
+                                 'needsupdate', 'weightoverride', 'timecreated', 'timemodified'];
 
     /**
      * The course this grade_item belongs to.
@@ -851,8 +851,8 @@ class grade_item extends grade_object {
 
         // normal grade item - just new final grades
         $result = true;
-        $grade_inst = new grade_grade();
-        $fields = implode(',', $grade_inst->required_fields);
+        $gradeinst = new grade_grade();
+        $fields = implode(',', $gradeinst->requiredfields);
         if ($userid) {
             $params = array($this->id, $userid);
             $rs = $DB->get_recordset_select('grade_grades', "itemid=? AND userid=?", $params, '', $fields);
@@ -2249,7 +2249,7 @@ class grade_item extends grade_object {
         }
 
         $gradeinst = new grade_grade();
-        $fields = implode(',', $gradeinst->required_fields);
+        $fields = implode(',', $gradeinst->requiredfields);
 
         $params[] = $this->courseid;
 

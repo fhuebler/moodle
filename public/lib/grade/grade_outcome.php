@@ -46,10 +46,10 @@ class grade_outcome extends grade_object {
 
     /**
      * Array of required table fields, must start with 'id'.
-     * @var array $required_fields
+     * @var array $requiredfields
      */
-    public $required_fields = array('id', 'courseid', 'shortname', 'fullname', 'scaleid','description',
-                                 'descriptionformat', 'timecreated', 'timemodified', 'usermodified');
+    public $requiredfields = ['id', 'courseid', 'shortname', 'fullname', 'scaleid', 'description',
+                                 'descriptionformat', 'timecreated', 'timemodified', 'usermodified'];
 
     /**
      * The course this outcome belongs to.

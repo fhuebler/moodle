@@ -848,7 +848,7 @@ class backup_final_scales_structure_step extends backup_structure_step {
 
         $scale = new backup_nested_element('scale', array('id'), array(
             'courseid', 'userid', 'name', 'scale',
-            'description', 'descriptionformat', 'timemodified'));
+            'description', 'descriptionformat', 'locked', 'timemodified'));
 
         // Build the tree
 

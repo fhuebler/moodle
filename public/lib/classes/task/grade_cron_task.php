@@ -66,7 +66,7 @@ class grade_cron_task extends scheduled_task {
         $rs->close();
 
         $gradeinst = new \grade_grade();
-        $fields = 'g.' . implode(',g.', $gradeinst->required_fields);
+        $fields = 'g.' . implode(',g.', $gradeinst->requiredfields);
         $sql = "SELECT $fields
                   FROM {grade_grades} g, {grade_items} i
                  WHERE g.locked = 0

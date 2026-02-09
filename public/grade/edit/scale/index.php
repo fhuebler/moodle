@@ -57,7 +57,8 @@ $strname           = get_string('name');
 $strdelete         = get_string('delete');
 $stredit           = get_string('edit');
 $strused           = get_string('used');
-$stredit           = get_string('edit');
+$strlocked         = get_string('locked', 'grades');
+$strlock           = get_string('lock', 'grades');
 
 switch ($action) {
     case 'delete':
@@ -105,6 +106,55 @@ switch ($action) {
             $scale->delete();
         }
         break;
+    case 'lock':
+        if (!confirm_sesskey()) {
+            break;
+        }
+        $scaleid = required_param('scaleid', PARAM_INT);
+        if (!$scale = grade_scale::fetch(['id' => $scaleid])) {
+            break;
+        }
+
+        if (empty($scale->courseid)) {
+            require_capability('moodle/course:managescales', context_system::instance());
+        } else if ($scale->courseid != $courseid) {
+            throw new \moodle_exception('invalidcourseid');
+        }
+
+        if (!$scale->can_lock()) {
+            break;
+        }
+
+        $lockconfirmed = optional_param('lockconfirmed', 0, PARAM_BOOL);
+        if (!$lockconfirmed) {
+            if ($courseid) {
+                $PAGE->navbar->add(
+                    get_string('scales'),
+                    new moodle_url('/grade/edit/scale/index.php', ['id' => $courseid])
+                );
+            }
+            $strlockscale = get_string('lockscale', 'grades');
+            $PAGE->navbar->add($strlockscale);
+            $PAGE->set_title($strlockscale);
+            $PAGE->set_heading($COURSE->fullname);
+            echo $OUTPUT->header();
+            $confirmurl = new moodle_url('index.php', [
+                    'id' => $courseid, 'scaleid' => $scale->id,
+                    'action' => 'lock',
+                    'sesskey' => sesskey(),
+                    'lockconfirmed' => 1]);
+            echo $OUTPUT->confirm(
+                get_string('scaleconfirmlock', 'grades', $scale->get_name()),
+                $confirmurl,
+                "index.php?id={$courseid}"
+            );
+            echo $OUTPUT->footer();
+            die;
+        } else {
+            $scale->lock();
+        }
+
+        break;
 }
 
 if (!$courseid) {
@@ -118,10 +168,18 @@ $heading = '';
 if ($courseid and $scales = grade_scale::fetch_all_local($courseid)) {
     $heading = $strcustomscales;
 
-    $data = array();
-    foreach($scales as $scale) {
-        $line = array();
-        $line[] = $scale->get_name() .'<div class="scale_options">'.str_replace(",", ", ", $scale->scale).'</div>';
+    $data = [];
+    foreach ($scales as $scale) {
+        $line = [];
+
+        $locked = $scale->is_locked();
+        if ($locked) {
+            $line[] = $OUTPUT->pix_icon('t/locked', $strlocked);
+        } else {
+            $line[] = grade_button('lock', $courseid, $scale);
+        }
+
+        $line[] = $scale->get_name() . '<div class="scale_options">' . str_replace(",", ", ", $scale->scale) . '</div>';
 
         $used = $scale->is_used();
         $line[] = $used ? get_string('yes') : get_string('no');
@@ -134,9 +192,9 @@ if ($courseid and $scales = grade_scale::fetch_all_local($courseid)) {
         $line[] = $buttons;
         $data[] = $line;
     }
-    $table->head  = array($strscale, $strused, $stredit);
-    $table->size  = array('70%', '20%', '10%');
-    $table->align = array('left', 'center', 'center');
+    $table->head  = [$strlock, $strscale, $strused, $stredit];
+    $table->size  = ['10%', '60%', '20%', '10%'];
+    $table->align = ['center', 'left', 'center', 'center'];
     $table->attributes['class'] = 'scaletable localscales table generaltable table-hover';
     $table->data  = $data;
 }
@@ -144,10 +202,26 @@ if ($courseid and $scales = grade_scale::fetch_all_local($courseid)) {
 if ($scales = grade_scale::fetch_all_global()) {
     $heading = $strstandardscale;
 
-    $data = array();
-    foreach($scales as $scale) {
-        $line = array();
-        $line[] = $scale->get_name().'<div class="scale_options">'.str_replace(",", ", ", $scale->scale).'</div>';
+    $data = [];
+    foreach ($scales as $scale) {
+        $line = [];
+
+        $locked = $scale->is_locked();
+        if ($locked) {
+            if (has_capability('moodle/course:managescales', context_system::instance())) {
+                $line[] = $OUTPUT->pix_icon('t/locked', $strlocked);
+            } else {
+                continue;
+            }
+        } else {
+            if (has_capability('moodle/course:managescales', context_system::instance())) {
+                $line[] = grade_button('lock', $courseid, $scale);
+            } else {
+                $line[] = $OUTPUT->pix_icon('t/lock', $strlocked);
+            }
+        }
+
+        $line[] = $scale->get_name() . '<div class="scale_options">' . str_replace(",", ", ", $scale->scale) . '</div>';
 
         $used = $scale->is_used();
         $line[] = $used ? get_string('yes') : get_string('no');
@@ -162,10 +236,10 @@ if ($scales = grade_scale::fetch_all_global()) {
         $line[] = $buttons;
         $data[] = $line;
     }
-    $table2->head  = array($strscale, $strused, $stredit);
-    $table->attributes['class'] = 'scaletable globalscales table generaltable table-hover';
-    $table2->size  = array('70%', '20%', '10%');
-    $table2->align = array('left', 'center', 'center');
+    $table2->head  = [$strlock, $strscale, $strused, $stredit];
+    $table2->attributes['class'] = 'scaletable globalscales table generaltable table-hover';
+    $table2->size  = ['10%', '60%', '20%', '10%'];
+    $table2->align = ['center', 'left', 'center', 'center'];
     $table2->data  = $data;
 }
 

@@ -39,6 +39,7 @@ final class grade_scale_test extends \grade_base_testcase {
         $this->sub_test_scale_load_items();
         $this->sub_test_scale_compact_items();
         $this->sub_test_scale_one_item();
+        $this->sub_test_grade_scale_lock();
     }
 
     protected function sub_test_scale_construct() {
@@ -173,5 +174,21 @@ final class grade_scale_test extends \grade_base_testcase {
         $status = $scale->is_used();
 
         $this->assertTrue($status);
+    }
+
+    /**
+     * Test that locking a grade scale works as expected.
+     *
+     * @covers \grade_scale::lock
+     */
+    protected function sub_test_grade_scale_lock(): void {
+        global $DB;
+        $gradescale = new \grade_scale($this->scale[1], false);
+        $locked = $DB->get_field('scale', 'locked', ['id' => $this->scale[1]->id]);
+        $this->assertEquals(false, $locked);
+        $this->assertTrue(method_exists($gradescale, 'lock'));
+        $this->assertTrue($gradescale->lock());
+        $locked = $DB->get_field('scale', 'locked', ['id' => $this->scale[1]->id]);
+        $this->assertEquals(true, $locked);
     }
 }

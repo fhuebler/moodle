@@ -89,7 +89,7 @@ class edit_outcome_form extends moodleform {
                     $options[$scale->id] = $scale->get_name();
                 }
             }
-            if ($scales = grade_scale::fetch_all_global()) {
+            if ($scales = grade_scale::fetch_all_global(true)) {
                 $options[-2] = '--'.get_string('scalesstandard');
                 foreach($scales as $scale) {
                     $options[$scale->id] = $scale->get_name();
@@ -100,7 +100,7 @@ class edit_outcome_form extends moodleform {
 
         } else {
             $options = array();
-            if ($scales = grade_scale::fetch_all_global()) {
+            if ($scales = grade_scale::fetch_all_global(true)) {
                 foreach($scales as $scale) {
                     $options[$scale->id] = $scale->get_name();
                 }

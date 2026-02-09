@@ -70,7 +70,7 @@ class competency_framework extends persistent {
         $mform->addRule('idnumber', null, 'required', null, 'client');
         $mform->addRule('idnumber', get_string('maximumchars', '', 100), 'maxlength', 100, 'client');
 
-        $scales = get_scales_menu();
+        $scales = get_scales_menu(0, true);
         $scaleid = $mform->addElement('select', 'scaleid', get_string('scale', 'tool_lp'), $scales);
         $mform->setType('scaleid', PARAM_INT);
         $mform->addHelpButton('scaleid', 'scale', 'tool_lp');

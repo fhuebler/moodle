@@ -1140,15 +1140,19 @@ function get_my_remotehosts() {
  *
  * @global object
  * @param int $courseid The id of the course as found in the 'course' table.
+ * @param boolean $unlockedonly Whether to include only unlocked scales.
  * @return array
  */
-function get_scales_menu($courseid=0) {
+function get_scales_menu($courseid = 0, $unlockedonly = false): array {
     global $DB;
 
     $sql = "SELECT id, name, courseid
               FROM {scale}
-             WHERE courseid = 0 or courseid = ?
-          ORDER BY courseid ASC, name ASC";
+             WHERE (courseid = 0 or courseid = ?)";
+    if ($unlockedonly) {
+        $sql .= " AND locked = 0";
+    }
+    $sql .= " ORDER BY courseid ASC, name ASC";
     $params = array($courseid);
     $scales = array();
     $results = $DB->get_records_sql($sql, $params);
